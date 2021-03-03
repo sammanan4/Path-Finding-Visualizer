@@ -1,9 +1,6 @@
 import 'dart:async';
-// import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-// import 'dart:math' show pow, sqrt;
 
 void main() {
   runApp(MyApp());
@@ -13,9 +10,7 @@ class Node {
   Color nodeColor;
   int x, y;
   int parentCoordsX, parentCoordsY;
-  // int distToSourceX = 99999, distToSourceY = 99999;
   int distToSource;
-  double eulerDist = 99999.0;
   bool blocked, visited;
   Node({
     this.nodeColor = Colors.grey,
@@ -24,8 +19,6 @@ class Node {
     this.visited = false,
     this.blocked = false,
     this.distToSource = 9999,
-    // this.distToSourceX = 99999,
-    // this.distToSourceY = 99999,
   });
   @override
   String toString() {
@@ -44,81 +37,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.teal,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home:
-          // NewApp(),
-          MyHomePage(title: 'PathFinder'),
-      // MyHomePage1(title: 'PathFinder'),
-    );
-  }
-}
-
-class NewApp extends StatefulWidget {
-  @override
-  _NewAppState createState() => _NewAppState();
-}
-
-class _NewAppState extends State<NewApp> {
-  GlobalKey _gridKey = GlobalKey();
-  GlobalKey _itemKey = GlobalKey();
-  Color _color1 = Colors.blue, _color2 = Colors.blue;
-  bool held = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Test"),
-      ),
-      body: GestureDetector(
-        onPanStart: (details) {
-          double curPosX = details.localPosition.dx;
-          double curPosY = details.localPosition.dy;
-          // print(details.globalPosition);
-          Size elSize = _itemKey.currentContext.size;
-          // print(_itemKey.currentContext.size);
-          RenderBox obj = _gridKey.currentContext.findRenderObject();
-          double gridPosX = obj.globalToLocal(Offset(0, 56)).dx;
-          double gridPosY = obj.globalToLocal(Offset(0, 56)).dy;
-          print('grid x = $gridPosX , grid y = $gridPosY , size = ${obj.size}');
-          print('cur x = $curPosX , cur y = $curPosY');
-          // print(((curPosX - gridPosX) ~/ elSize.width).toInt());
-        },
-        onPanUpdate: (details) {
-          double curPosX = details.localPosition.dx;
-          double curPosY = details.localPosition.dy;
-          // print(details.globalPosition);
-          Size elSize = _itemKey.currentContext.size;
-          // print(_itemKey.currentContext.size);
-          RenderBox obj = _gridKey.currentContext.findRenderObject();
-          double gridPosX = obj.globalToLocal(Offset(0, 56)).dx;
-          double gridPosY = obj.globalToLocal(Offset(0, 56)).dy;
-          print('grid x = $gridPosX , grid y = $gridPosY , size = ${obj.size}');
-          print('cur x = $curPosX , cur y = $curPosY');
-          // print(((curPosX - gridPosX) ~/ elSize.width).toInt());
-        },
-        onPanEnd: (details) {
-          setState(() {
-            held = false;
-            // print(details);
-          });
-        },
-        child: Column(
-          key: _gridKey,
-          children: [
-            Container(
-              key: _itemKey,
-              width: 100.0,
-              height: 100.0,
-              color: _color1,
-            ),
-            Container(
-              width: 100.0,
-              height: 100.0,
-              color: _color2,
-            ),
-          ],
-        ),
-      ),
+      home: MyHomePage(title: 'PathFinder'),
     );
   }
 }
@@ -175,13 +94,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
   void dijkstraFind() async {
-    // Comparator<Node> comp = (Node node1, Node node2) {
-    // double d1 = sqrt(pow(node1.distToSourceX - 0, 2) + pow(node1.distToSourceY - 0, 2));
-    // double d2 = sqrt(pow(node2.distToSourceX - 0, 2) + pow(node2.distToSourceY - 0, 2));
-    // return node1.eulerDist.compareTo(node2.eulerDist);
-    // return node1.distToSource.compareTo(node2.distToSource);
-    // };
-
     PriorityQueue<List<int>> queue = PriorityQueue<List<int>>((List<int> node1, List<int> node2) {
       return adjMat[node1[0]][node1[1]].distToSource.compareTo(adjMat[node2[0]][node2[1]].distToSource);
     });
@@ -206,9 +118,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           !adjMat[node.x][node.y + 1].blocked) {
         // compare current distance to source and new distance to source (if we update)
         if (node.distToSource + 1 < adjMat[node.x][node.y + 1].distToSource) {
-          // adjMat[node.x][node.y + 1].distToSourceX = tempNode.distToSourceX;
           adjMat[node.x][node.y + 1].distToSource = node.distToSource + 1;
-          // adjMat[node.x][node.y + 1].eulerDist = sqrt(pow(tempNode.distToSourceX,2) + pow(tempNode.distToSourceY,2));
           adjMat[node.x][node.y + 1].parentCoordsX = node.x;
           adjMat[node.x][node.y + 1].parentCoordsY = node.y;
           if (!queue.contains([node.x, node.y + 1])) queue.add([node.x, node.y + 1]);
@@ -223,9 +133,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           !adjMat[node.x + 1][node.y].visited &&
           !adjMat[node.x + 1][node.y].blocked) {
         if (node.distToSource + 1 < adjMat[node.x + 1][node.y].distToSource) {
-          // adjMat[node.x + 1][node.y].distToSourceX = tempNode.distToSourceX;
           adjMat[node.x + 1][node.y].distToSource = node.distToSource + 1;
-          // adjMat[node.x + 1][node.y].eulerDist = sqrt(pow(tempNode.distToSourceX,2) + pow(tempNode.distToSourceY,2));
           adjMat[node.x + 1][node.y].parentCoordsX = node.x;
           adjMat[node.x + 1][node.y].parentCoordsY = node.y;
           if (!queue.contains([node.x + 1, node.y])) queue.add([node.x + 1, node.y]);
@@ -240,9 +148,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           !adjMat[node.x][node.y - 1].visited &&
           !adjMat[node.x][node.y - 1].blocked) {
         if (node.distToSource + 1 < adjMat[node.x][node.y - 1].distToSource) {
-          // adjMat[node.x][node.y - 1].distToSourceX = tempNode.distToSourceX;
           adjMat[node.x][node.y - 1].distToSource = node.distToSource + 1;
-          // adjMat[node.x][node.y - 1].eulerDist = sqrt(pow(tempNode.distToSourceX,2) + pow(tempNode.distToSourceY,2));
           adjMat[node.x][node.y - 1].parentCoordsX = node.x;
           adjMat[node.x][node.y - 1].parentCoordsY = node.y;
           if (!queue.contains([node.x, node.y - 1])) queue.add([node.x, node.y - 1]);
@@ -256,9 +162,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           !adjMat[node.x - 1][node.y].visited &&
           !adjMat[node.x - 1][node.y].blocked) {
         if (node.distToSource + 1 < adjMat[node.x - 1][node.y].distToSource) {
-          // adjMat[node.x - 1][node.y].distToSourceX = tempNode.distToSourceX;
           adjMat[node.x - 1][node.y].distToSource = node.distToSource + 1;
-          // adjMat[node.x - 1][node.y].eulerDist = sqrt(pow(tempNode.distToSourceX,2) + pow(tempNode.distToSourceY,2));
           adjMat[node.x - 1][node.y].parentCoordsX = node.x;
           adjMat[node.x - 1][node.y].parentCoordsY = node.y;
           if (!queue.contains([node.x - 1, node.y])) queue.add([node.x - 1, node.y]);
@@ -374,8 +278,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           child: Row(
             children: [
               // Options
-              // Expanded(
-              // child:
               Container(
                 width: 300.0,
                 child: Column(
@@ -461,10 +363,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 indent: 100.0,
                 endIndent: 100.0,
               ),
-              // // Graph
-              // Expanded(
-              //   flex: 2,
-              //   child:
+              // Graph
               Padding(
                 padding: EdgeInsets.only(top: 50.0, bottom: 0.0),
                 child: Column(
@@ -489,11 +388,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               ),
                             )
                         ],
-                      )
+                      ),
                   ],
                 ),
               ),
-              // ),
             ],
           ),
         ),
